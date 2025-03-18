@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aizawa Attractor</title>
+    <style>
+        body { margin: 0; 
+        background-color: black; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        height: 100vh;
+        margin: 0; 
+        outline: none;
+        background: #000;
+        -webkit-tap-highlight-color: transparent;
+        }
+        canvas { display: block; }
+        #infoButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .info-popup {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            width: 300px;
+            text-align: left;
+            user-select: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <button id="infoButton">&#9432;</button>
+    <div class="info-popup" id="infoPopup">
+        <p style="text-align:center;" ><strong>Aizawa Attractor</strong></p>
+    <p style="color:pink; text-align: center;">The Aizawa Attractor is a chaotic dynamical system that exhibits complex, beautiful, and intricate behavior. It is a type of strange attractor, which means it is a set of numerical values toward which a system tends to evolve, regardless of the starting conditions. The Aizawa Attractor is known for its visually appealing 3D structure, often resembling a swirling, ribbon-like shape.
+    </p>
+            <p style="text-align:center;">Coming Soon!!</p>
+    </div>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add a space background with glittering stars
+        const starGeometry = new THREE.BufferGeometry();
+        const starVertices = [];
+        const starColors = [];
+
+        for (let i = 0; i < 5000; i++) {
+            const x = (Math.random() - 0.5) * 2000;
+            const y = (Math.random() - 0.5) * 2000;
+            const z = (Math.random() - 0.5) * 2000;
+            starVertices.push(x, y, z);
+
+            const color = new THREE.Color();
+            color.setHSL(Math.random(), 1.0, 0.7);
+            starColors.push(color.r, color.g, color.b);
+        }
+
+        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+        starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
+
+        const starMaterial = new THREE.PointsMaterial({ vertexColors: true, size: 0.5 });
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        scene.add(stars);
+
+        // Aizawa Attractor parameters
+        const a = 0.95;
+        const b = 0.7;
+        const c = 0.6;
+        const d = 3.5;
+        const e = 0.25;
+        const f = 0.1;
+
+        let points = [];
+        let colors = [];
+        let x = 0.1, y = 0, z = 0;
+
+        // Generate points and colors
+        for (let i = 0; i < 20000; i++) {
+            const dx = (z - b) * x - d * y;
+            const dy = d * x + (z - b) * y;
+            const dz = c + a * z - (Math.pow(z, 3) / 3) - (Math.pow(x, 2) + Math.pow(y, 2)) * (1 + e * z) + f * z * Math.pow(x, 3);
+
+            x += dx * 0.01;
+            y += dy * 0.01;
+            z += dz * 0.01;
+
+            points.push(new THREE.Vector3(x, y, z));
+
+            // Create a color based on the position
+            const color = new THREE.Color();
+            color.setHSL((x + y + z) % 1, 1.0, 0.5);
+            colors.push(color.r, color.g, color.b);
+        }
+
+        // Create geometry and add points and colors
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+        // Create material with vertex colors
+        const material = new THREE.LineBasicMaterial({ vertexColors: true });
+
+        // Create line segments for wireframe effect
+        const wireframe = new THREE.LineSegments(geometry, material);
+        scene.add(wireframe);
+
+        // Camera position
+        camera.position.z = 5;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            wireframe.rotation.x += 0.01;
+            wireframe.rotation.y += 0.01;
+
+            // Animate stars
+            const positions = starGeometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 1] -= 0.1; // Move stars downwards
+                if (positions[i + 1] < -1000) positions[i + 1] = 1000; // Reset star position
+            }
+            starGeometry.attributes.position.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+        
+        $("#infoButton").click(function() {
+            $("#infoPopup").fadeToggle();
+        });
+    </script>
+</body>
+      </html>
