@@ -15,7 +15,7 @@ The equation used in this code describes the **Aizawa Attractor**, which is a sy
 - The attractor has a **chaotic yet structured** shape, forming a swirling 3D curve.
 - The cubic and quadratic terms contribute to the system’s **sensitivity to initial conditions**, a key characteristic of chaos theory.
 
-### **In Your Code:**
+### **Footnote**
 - The code **numerically integrates** these equations using small steps (\( dt = 0.01 \)).
 - It calculates a sequence of points and **renders them in 3D** using Three.js.
 - The attractor rotates slowly, showing its **intricate and beautiful structure**.
